@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Аватарка от KR1zz@R</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom, #0f0f0f, #1a1a1a);
+      color: white;
+      text-align: center;
+    }
+    header {
+      padding: 20px;
+      font-size: 24px;
+      background-color: #111;
+      box-shadow: 0 2px 10px #00ffff55;
+    }
+    main {
+      padding: 30px 20px;
+    }
+    button, select, input[type="color"], input[type="text"] {
+      font-size: 18px;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 8px;
+      border: none;
+    }
+    button {
+      background-color: #00ffff;
+      color: black;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00ffff;
+    }
+    canvas {
+      margin-top: 20px;
+      border: 2px solid #00ffff;
+      max-width: 90vw;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Привет! Это генератор аватарок от <strong>KR1zz@R</strong>
+  </header>
+  <main>
+    <p>Загрузите изображение для фона аватарки:</p>
+    <input type="file" accept="image/*" onchange="handleImage(event)"><br>
+
+    <p>Введите текст (до 15 символов):</p>
+    <input type="text" id="avatarText" maxlength="15"><br>
+
+    <p>Выберите шрифт:</p>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Rubik+Mono+One&family=Anton&display=swap');
+    </style>
+    <select id="fontSelect" style="font-size: 20px;">
+      <option value="'Rubik Mono One', sans-serif" style="font-family: 'Rubik Mono One', sans-serif;">Rubik Mono One</option>
+      <option value="'Anton', sans-serif" style="font-family: 'Anton', sans-serif;">Anton</option>
+      <option value="'Oswald', sans-serif" style="font-family: 'Oswald', sans-serif;">Oswald</option>
+      <option value="Impact" style="font-family: Impact;">Impact</option>
+      <option value="Comic Sans MS" style="font-family: Comic Sans MS;">Comic Sans</option>
+    </select><br>
+
+    <p>Размер текста (px):</p>
+    <input type="number" id="fontSize" min="20" max="300" value="180"><br>
+    <p>Цвет текста и обводки:</p>
+    <input type="color" id="fillColor" value="#ffffff">
+    <input type="color" id="strokeColor" value="#1e3dff"><br>
+
+    <p>Положение текста:</p>
+    <select id="positionSelect">
+      <option value="top">Верх</option>
+      <option value="bottom">Низ</option>
+      <option value="left">Слева</option>
+      <option value="right">Справа</option>
+      <option value="center">Центр</option>
+    </select><br>
+
+    <button onclick="generateAvatar()">Создать аватарку</button>
+    <a id="downloadLink" class="hidden" download="avatar.png"><button>Скачать аватарку</button></a>
+
+    <canvas id="canvas" width="400" height="400"></canvas>
+  </main>
+
+  <script>
+    let img = new Image();
+    let canvas = document.getElementById('canvas');
+    let ctx = canvas.getContext('2d');
+
+    function handleImage(e) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        img.onload = function() {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+        }
+        img.src = event.target.result;
+      }
+      reader.readAsDataURL(e.target.files[0]);
+    }
+
+    function generateAvatar() {
+      const text = document.getElementById('avatarText').value.trim();
+      const font = document.getElementById('fontSelect').value;
+      const fill = document.getElementById('fillColor').value;
+      const stroke = document.getElementById('strokeColor').value;
+      const position = document.getElementById('positionSelect').value;
+
+      if (!text) {
+        alert("Введите текст!");
+        return;
+      }
+
+      ctx.drawImage(img, 0, 0);
+      const fontSize = document.getElementById('fontSize').value;
+      ctx.font = `bold ${fontSize}px ${font}`;
+      ctx.fillStyle = fill;
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = 8;
+      ctx.shadowColor = "black";
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetX = 3;
+      ctx.shadowOffsetY = 3;
+
+      let x = canvas.width / 2;
+      let y = 80;
+
+      switch(position) {
+        case 'top': y = 80; x = canvas.width / 2; ctx.textAlign = 'center'; break;
+        case 'bottom': y = canvas.height - 40; x = canvas.width / 2; ctx.textAlign = 'center'; break;
+        case 'left': y = canvas.height / 2; x = 30; ctx.textAlign = 'left'; break;
+        case 'right': y = canvas.height / 2; x = canvas.width - 30; ctx.textAlign = 'right'; break;
+        case 'center': y = canvas.height / 2; x = canvas.width / 2; ctx.textAlign = 'center'; break;
+      }
+
+      ctx.strokeText(text, x, y);
+      ctx.fillText(text, x, y);
+
+      const link = document.getElementById('downloadLink');
+      link.href = canvas.toDataURL("image/png");
+      link.classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>
